@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    image: dribba-interview:latest
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  web-dev:
+    build: .
+    command: pnpm dev -- -H 0.0.0.0
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/app:cached
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    tty: true
+    stdin_open: true

@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Este repositorio contiene una aplicación creada con Next.js (TypeScript) usada como ejercicio técnico/interview.
 
-## Getting Started
+**ProductCard (Componente)**
 
-First, run the development server:
+- **Tipo:** Server Component. El componente principal de presentación `ProductCard` está implementado como componente de servidor para priorizar SEO y rendimiento. Al renderizar el HTML en el servidor se entrega markup estático a los clientes y motores de búsqueda, reduciendo la cantidad de JavaScript enviada al navegador y mejorando el ancho de banda y el Time To First Byte (TTFB).
+- **Interactividad separada:** la lógica interactiva (añadir producto) está delegada a un componente cliente independiente (`AddProductButton`) para mantener `ProductCard` como componente servidor. Ver [features/products/components/AddProductButton.tsx](features/products/components/AddProductButton.tsx) para la parte cliente.
+- **Reutilizabilidad:** `ProductCard` está diseñado para reutilizarse en distintos contextos:
+  - Recibe props tipadas (`product`, `onAdd`, `toastConfig`, `currency`, `locale`, `className`) para ser configurable desde quien lo consuma.
+  - Proporciona valores por defecto para `currency` y `locale`, y una `className` para extensión de estilos desde fuera.
+  - Usa composición: incorpora `AddProductButton` para la interacción y permite que el padre controle la acción `onAdd`.
+  - Mantiene la responsabilidad única: formatea precio con `Intl.NumberFormat`, usa `next/image` para imágenes y expone atributos accesibles (`aria-labelledby`) para mejor SEO y accesibilidad.
+
+**Resumen**
+
+- **Stack:** Next.js, React, TypeScript, Tailwind CSS (y utilidades relacionadas).
+- **Objetivo:** ejemplo de tienda/listado de productos con componentes reutilizables y diseño responsivo.
+
+**Requisitos**
+
+- Node.js v18+ y `pnpm` (recomendado) para desarrollo local.
+- Docker y Docker Compose (opcional) para ejecutar en contenedores.
+
+**Desarrollo local**
+
+1. Instala dependencias:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Levanta el servidor de desarrollo:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Abre http://localhost:3000 en tu navegador.
 
-## Learn More
+**Usando Docker**
 
-To learn more about Next.js, take a look at the following resources:
+Se incluyen un `Dockerfile` multi-stage para producción y un `docker-compose.yml` con un servicio de desarrollo.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Construir la imagen (producción):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker build -t dribba-interview:latest .
+```
 
-## Deploy on Vercel
+- Ejecutar la imagen:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+docker run --rm -p 3000:3000 dribba-interview:latest
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Levantar con `docker-compose` en desarrollo (monta el código y usa `pnpm dev`):
+
+```bash
+docker compose up web-dev
+```
+
+- Levantar la versión de producción con `docker-compose`:
+
+```bash
+docker compose up web
+```
+
+**Notas**
+
+- El `Dockerfile` usa `pnpm` vía `corepack` y hace un build de Next.js para producir un contenedor optimizado.
+- El servicio `web-dev` en `docker-compose.yml` monta el código fuente para permitir hot-reloading desde dentro del contenedor.
+- Si cambias puertos, recuerda ajustar `PORT` y el mapeo en `docker-compose.yml`.

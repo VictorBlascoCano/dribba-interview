@@ -1,0 +1,12 @@
+.next
+node_modules
+dist
+.venv
+.env
+.DS_Store
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+.git
+coverage
+/*.log
